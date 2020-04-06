@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!-- 启用注释驱动自动注入 -->
+     <context:annotation-config/>
+    <!-- 配置自动扫描的包 -->
+    <context:component-scan base-package="com.wwq.mvc.controller">
+        <!--<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>-->
+    </context:component-scan>
+
+
+    <!-- 校验器 -->
+    <bean id="validator"
+          class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        <!-- hibernate校验器 -->
+        <property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>
+        <!-- 指定校验使用的资源文件，在文件中配置校验错误信息，如果不指定则默认使用classpath下的ValidationMessages.properties -->
+        <property name="validationMessageSource" ref="messageSource" />
+    </bean>
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="useCodeAsDefaultMessage" value="false"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+
+    <!--1:开始SpringMVC注解模式 -->
+    <!--简化配置： -->
+    <!--1）自动注册DefaultAnnotationHandlerMapping,AnnotationMethodHandlerAdapter -->
+    <!--2）提供一些列：数据绑定，数字和日期的format @NumberFormat @DataTimeFormart，xml,json 默认读写支持。 -->
+    <!-- 类型转化 -->
+    <bean id="conversionService"
+          class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+    </bean>
+    <!-- Enables the Spring MVC @Controller programming model -->
+    <mvc:annotation-driven conversion-service="conversionService"
+                           validator="validator">
+        <mvc:message-converters register-defaults="true">
+            <!-- 将Jackson2HttpMessageConverter的默认格式化输出为true -->
+            <!-- 配置Fastjson支持 -->
+            <bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>application/json</value>
+                        <value>text/html;charset=UTF-8</value>
+                    </list>
+                </property>
+                <!--<property name="fastJsonConfig">
+                    <list>
+                        &lt;!&ndash;<value>WriteMapNullValue</value>&ndash;&gt;
+                        <value>QuoteFieldNames</value>
+                    </list>
+                </property>-->
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!--2.静态资源默认servlet配置 -->
+    <!-- 1).加入对静态资源处理：js,gif,png 2).允许使用 "/" 做整体映射 -->
+    <mvc:default-servlet-handler/>
+    <mvc:resources location="/WEB-INF/static/" mapping="/static/**"/>
+
+    <!--3：配置JSP 显示ViewResolver  配置视图解析器 如何把handler 方法返回值解析为实际的物理视图 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <!-- jsp路径前缀 -->
+        <property name="prefix" value="/WEB-INF/jsp/"></property>
+        <!-- jsp路径后缀 -->
+        <property name="suffix" value=".jsp"></property>
+    </bean>
+
+    <!--============-->
+    <!--拦截器 -->
+    <!-- <mvc:interceptors>
+         <mvc:interceptor>
+             <mvc:mapping path="/**"/>
+             <bean class="com.sample.ssm.interceptor.RootInterceptor"></bean>
+         </mvc:interceptor>
+     </mvc:interceptors>-->
+
+
+    <!--<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        &lt;!&ndash; 定义默认的异常处理页面，当该异常类型的注册时使用 &ndash;&gt;
+        <property name="defaultErrorView" value="success"></property>
+        &lt;!&ndash; 定义异常处理页面用来获取异常信息的变量名，默认名为exception &ndash;&gt;
+        <property name="exceptionAttribute" value="message"></property>
+    </bean>-->
+
+</beans>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wwq.mvc.dao.demo.UserInfoMapper">
+    <resultMap id="BaseResultMap" type="com.wwq.mvc.entity.UserInfo">
+        <id column="user_id" jdbcType="INTEGER" property="userId" />
+        <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        user_id, user_name
+    </sql>
+    <select id="selectOne" resultType="com.wwq.mvc.entity.UserInfo">
+        SELECT user_id, user_name FROM user_info WHERE user_id = #{userId,jdbcType=INTEGER}
+    </select>
+
+    <insert id="insertOne" parameterType="com.wwq.mvc.entity.UserInfo">
+         INSERT   INTO  user_info (user_name) VALUES  (#{userName})
+    </insert>
+</mapper>
